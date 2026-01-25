@@ -78,7 +78,7 @@ export default function Documentation() {
             <span className="text-sm font-medium">Back to Home</span>
           </Link>
           <div className="mt-6 flex items-center gap-3">
-            <img src="/assets/logo-shield.png" alt="Logo" className="w-6 h-6" />
+            <img src="/assets/aico-ai-logo-withouth-text.png" alt="Logo" className="w-8 h-8" />
             <span className="font-display font-bold text-lg text-white tracking-tight">Aico AI Docs</span>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function Documentation() {
           </div>
           <div className="flex items-center gap-4 ml-4">
             <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
-              v1.0.4
+              v1.1.1
             </Button>
             <Separator orientation="vertical" className="h-4 bg-white/10" />
             <a href="https://github.com/LukasdeSouza/aico-ai" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors">
