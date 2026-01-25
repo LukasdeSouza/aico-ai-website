@@ -33,10 +33,7 @@ const allowlist = [
 ];
 
 async function buildAll() {
-  await Promise.all([
-    rm("api", { recursive: true, force: true }),
-    rm("public", { recursive: true, force: true }),
-  ]);
+  await rm("dist", { recursive: true, force: true });
 
   console.log("building client...");
   await viteBuild();
@@ -54,7 +51,7 @@ async function buildAll() {
     platform: "node",
     bundle: true,
     format: "cjs",
-    outfile: "api/index.cjs",
+    outfile: "dist/index.cjs",
     define: {
       "process.env.NODE_ENV": '"production"',
     },
