@@ -78,7 +78,7 @@ export default function Documentation() {
             <span className="text-sm font-medium">Back to Home</span>
           </Link>
           <div className="mt-6 flex items-center gap-3">
-            <img src="/assets/aico-ai-logo-withouth-text.png" alt="Logo" className="w-8 h-8" />
+            {/* <img src="/assets/aico-ai-logo-withouth-text.png" alt="Logo" className="w-8 h-8" /> */}
             <span className="font-display font-bold text-lg text-white tracking-tight">Aico AI Docs</span>
           </div>
         </div>
