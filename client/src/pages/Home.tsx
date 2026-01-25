@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import { SiGithub, SiGitlab, SiGnubash } from "react-icons/si";
 import { Check, Terminal, Play, Settings, GitBranch, Shield, Zap, Lock, Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ export default function Home() {
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <a href="#features" className="hover:text-primary transition-colors">Features</a>
-            <a href="#quickstart" className="hover:text-primary transition-colors">Quick Start</a>
+            <Link href="/documentation" className="hover:text-primary transition-colors">Documentation</Link>
             <a href="#comparison" className="hover:text-primary transition-colors">Comparison</a>
           </div>
           <div className="flex items-center gap-4">
@@ -224,7 +225,7 @@ export default function Home() {
           </div>
           
           <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-primary transition-colors">Documentation</a>
+            <Link href="/documentation" className="hover:text-primary transition-colors">Documentation</Link>
             <a href="#" className="hover:text-primary transition-colors">Report an Issue</a>
             <a href="#" className="hover:text-primary transition-colors">Contact Us</a>
           </div>
