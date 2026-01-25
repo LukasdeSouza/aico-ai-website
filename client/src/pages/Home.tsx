@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { SiGithub, SiGitlab, SiGnubash } from "react-icons/si";
-import { Check, Terminal, Play, Settings, GitBranch, Shield, Zap, Lock, Code2 } from "lucide-react";
+import { Check, Terminal, Play, Settings, GitBranch, Shield, Zap, Lock, Code2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import React, { useState } from "react";
 
 // Fade in animation variant
 const fadeIn = {
@@ -20,6 +22,20 @@ const stagger = {
 };
 
 export default function Home() {
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    const text = "npm install -g aico-ai";
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    toast({
+      title: "Copied to clipboard",
+      description: "The installation command has been copied.",
+    });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary">
 
@@ -88,9 +104,16 @@ export default function Home() {
             transition={{ delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Button size="lg" className="h-12 px-8 text-base bg-primary text-primary-foreground hover:bg-primary/90 font-semibold hover:cursor-pointer w-full sm:w-auto shadow-[0_0_20px_rgba(0,229,188,0.2)]">
-              Get Started
-              <span className="ml-2 opacity-70 text-xs font-mono bg-black/20 px-2 py-0.5 rounded">npm install -g aico-ai</span>
+            <Button 
+              size="lg" 
+              onClick={copyToClipboard}
+              className="h-12 px-8 text-base bg-primary text-primary-foreground hover:bg-primary/90 font-semibold hover:cursor-pointer w-full sm:w-auto shadow-[0_0_20px_rgba(0,229,188,0.2)]"
+            >
+              {copied ? "Copied!" : "Get Started"}
+              <span className="ml-2 opacity-70 text-xs font-mono bg-black/20 px-2 py-0.5 rounded flex items-center gap-2">
+                npm install -g aico-ai
+                <Copy className="w-3 h-3" />
+              </span>
             </Button>
             <Button size="lg" variant="outline" className="h-12 px-8 text-base hover:cursor-pointer border-white/10 hover:bg-white/5 hover:text-white w-full sm:w-auto"
               onClick={() => window.open("https://github.com/LukasdeSouza/aico-ai", '_blank')}>
