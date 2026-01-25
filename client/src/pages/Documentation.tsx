@@ -1,11 +1,9 @@
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { 
   Search, 
   ChevronRight, 
-  ChevronDown, 
   ArrowLeft, 
-  FileText, 
   Terminal, 
   Shield, 
   Cpu, 
@@ -14,12 +12,15 @@ import {
   ExternalLink,
   Layers,
   Zap,
-  Lock
+  Code2,
+  Copy,
+  Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 const sidebarItems = [
   {
@@ -38,6 +39,11 @@ const sidebarItems = [
     items: ["AI Code Review", "Custom Team Rules", "Vulnerability Scanning", "CI/CD Integration"]
   },
   {
+    title: "Guides",
+    icon: <Code2 className="w-4 h-4" />,
+    items: ["Team Rules Guide"]
+  },
+  {
     title: "Configuration",
     icon: <Layers className="w-4 h-4" />,
     items: ["aico.config.json", "AI Providers", "Rule Definitions"]
@@ -50,6 +56,18 @@ const sidebarItems = [
 ];
 
 export default function Documentation() {
+  const [location, setLocation] = useLocation();
+  const { toast } = useToast();
+  const activePage = location.includes("team-rules") ? "Team Rules Guide" : "Installation";
+
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({
+      title: "Copied to clipboard",
+      description: "Code snippet copied successfully.",
+    });
+  };
+
   return (
     <div className="flex h-screen bg-[#0B1120] text-slate-300 font-sans overflow-hidden">
       {/* Sidebar */}
@@ -77,12 +95,13 @@ export default function Documentation() {
                   {section.items.map((item, itemIdx) => (
                     <button
                       key={itemIdx}
+                      onClick={() => setLocation(item === "Team Rules Guide" ? "/documentation/team-rules" : "/documentation")}
                       className={`w-full text-left px-2 py-1.5 rounded-md text-sm transition-colors flex items-center justify-between group ${
-                        item === "Installation" ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 hover:text-white"
+                        item === activePage ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 hover:text-white"
                       }`}
                     >
                       {item}
-                      <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${item === "Installation" ? "opacity-100" : ""}`} />
+                      <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${item === activePage ? "opacity-100" : ""}`} />
                     </button>
                   ))}
                 </div>
@@ -117,118 +136,168 @@ export default function Documentation() {
         {/* Content */}
         <ScrollArea className="flex-1">
           <div className="max-w-4xl mx-auto px-8 py-12 flex gap-12">
-            <div className="flex-1">
-              <div className="mb-10">
-                <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
-                  <span>Getting Started</span>
-                  <ChevronRight className="w-3 h-3" />
-                  <span className="text-primary">Installation</span>
-                </nav>
-                <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">Installation</h1>
-                <p className="text-lg text-slate-400 leading-relaxed">
-                  Learn how to install and set up Aico AI in your development environment. Aico AI is distributed as an NPM package and can be used globally or locally within a project.
-                </p>
-              </div>
+            {activePage === "Team Rules Guide" ? (
+              <div className="flex-1">
+                <div className="mb-10">
+                  <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                    <span>Guides</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-primary">Team Rules Guide</span>
+                  </nav>
+                  <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">Team Rules Guide</h1>
+                  <p className="text-lg text-slate-400 leading-relaxed">
+                    Complete guide to using Aico's Team Rules feature for enforcing consistent code quality standards across your team.
+                  </p>
+                </div>
 
-              <div className="space-y-10 prose prose-invert prose-slate max-w-none">
-                <section>
-                  <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                    <Terminal className="w-5 h-5 text-primary" />
-                    System Requirements
-                  </h2>
-                  <p>Before installing Aico AI, ensure you have the following requirements met:</p>
-                  <ul className="list-disc pl-5 space-y-2 text-slate-400">
-                    <li><strong className="text-slate-200">Node.js:</strong> Version 18.0.0 or higher</li>
-                    <li><strong className="text-slate-200">NPM/Yarn/PNPM:</strong> Any modern package manager</li>
-                    <li><strong className="text-slate-200">Git:</strong> Installed and configured in your shell</li>
-                  </ul>
-                </section>
-
-                <section>
-                  <h2 className="text-2xl font-bold text-white mb-4">Global Installation</h2>
-                  <p className="mb-4">For most users, we recommend installing Aico AI globally to access the <code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded">aico</code> command from anywhere.</p>
-                  <div className="bg-[#1E293B] rounded-xl border border-white/5 overflow-hidden">
-                    <div className="px-4 py-2 bg-white/5 border-b border-white/5 flex items-center justify-between">
-                      <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">Bash</span>
-                      <Button variant="ghost" size="sm" className="h-7 text-[10px] text-slate-400 hover:text-white">Copy</Button>
+                <div className="space-y-10 prose prose-invert prose-slate max-w-none">
+                  <section className="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-8">
+                    <div className="flex gap-4">
+                      <Info className="w-6 h-6 text-primary shrink-0" />
+                      <p className="text-sm text-slate-300 m-0">
+                        Team Rules allow you to define and enforce custom code quality standards that are specific to your team or project. Unlike generic linting tools, Aico's Team Rules integrate with AI-powered reviews to provide context-aware feedback.
+                      </p>
                     </div>
-                    <div className="p-5 font-mono text-sm">
-                      <div className="flex gap-3">
-                        <span className="text-slate-600 select-none">$</span>
-                        <span className="text-primary">npm install -g aico-ai</span>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Quick Start</h2>
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-200 mb-2">1. Initialize Team Rules</h3>
+                        <CodeBlock code="aico rules init" onCopy={copyCode} />
+                        <p className="text-sm text-slate-400 mt-2">This creates a <code className="text-primary bg-primary/10 px-1 rounded">.aico/rules.json</code> file with a default template.</p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-200 mb-2">2. Customize Your Rules</h3>
+                        <CodeBlock 
+                          language="json"
+                          code={`{
+  "version": "1.0",
+  "rules": {
+    "naming": {
+      "functions": "camelCase",
+      "classes": "PascalCase",
+      "constants": "UPPER_SNAKE_CASE"
+    },
+    "complexity": {
+      "maxFunctionLength": 50,
+      "maxCyclomaticComplexity": 10
+    }
+  }
+}`} 
+                          onCopy={copyCode} 
+                        />
                       </div>
                     </div>
-                  </div>
-                </section>
+                  </section>
 
-                <section>
-                  <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-primary" />
-                    Local Installation
-                  </h2>
-                  <p className="mb-4">If you prefer to keep dependencies scoped to your project or use them in CI/CD pipelines:</p>
-                  <div className="bg-[#1E293B] rounded-xl border border-white/5 overflow-hidden">
-                    <div className="px-4 py-2 bg-white/5 border-b border-white/5 flex items-center justify-between">
-                      <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">Bash</span>
-                      <Button variant="ghost" size="sm" className="h-7 text-[10px] text-slate-400 hover:text-white">Copy</Button>
-                    </div>
-                    <div className="p-5 font-mono text-sm">
-                      <div className="flex gap-3">
-                        <span className="text-slate-600 select-none">$</span>
-                        <span className="text-primary">npm install --save-dev aico-ai</span>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <section className="bg-primary/5 border border-primary/20 rounded-xl p-6">
-                  <h3 className="text-primary font-bold mb-2 flex items-center gap-2">
-                    <Zap className="w-4 h-4" />
-                    Next Steps
-                  </h3>
-                  <p className="text-sm text-slate-300">Once installed, you should initialize your project configuration by running <code className="bg-primary/20 text-primary px-1 rounded">aico init</code> in your terminal.</p>
-                </section>
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-primary" />
+                      Security Rules
+                    </h2>
+                    <p className="mb-4">Enable built-in security checks to catch vulnerabilities early:</p>
+                    <CodeBlock 
+                      language="json"
+                      code={`"security": {
+  "noHardcodedSecrets": true,
+  "noEval": true,
+  "noInnerHTML": true,
+  "requireInputValidation": true
+}`} 
+                      onCopy={copyCode} 
+                    />
+                    <ul className="mt-4 space-y-2 text-sm text-slate-400">
+                      <li>• <strong className="text-slate-200">noHardcodedSecrets:</strong> Detects API keys and passwords</li>
+                      <li>• <strong className="text-slate-200">noEval:</strong> Blocks dangerous eval() usage</li>
+                    </ul>
+                  </section>
+                </div>
               </div>
+            ) : (
+              <div className="flex-1">
+                <div className="mb-10">
+                  <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                    <span>Getting Started</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-primary">Installation</span>
+                  </nav>
+                  <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">Installation</h1>
+                  <p className="text-lg text-slate-400 leading-relaxed">
+                    Learn how to install and set up Aico AI in your development environment.
+                  </p>
+                </div>
 
-              {/* Navigation Buttons */}
-              <div className="mt-16 pt-8 border-t border-white/5 flex justify-between">
-                <Link href="/" className="group flex flex-col items-start gap-1">
-                  <span className="text-xs text-slate-500 uppercase font-bold tracking-widest">Previous</span>
-                  <span className="text-white group-hover:text-primary transition-colors flex items-center gap-2 font-medium">
-                    <ArrowLeft className="w-4 h-4" />
-                    Welcome
-                  </span>
-                </Link>
-                <button className="group flex flex-col items-end gap-1 text-right">
-                  <span className="text-xs text-slate-500 uppercase font-bold tracking-widest">Next</span>
-                  <span className="text-white group-hover:text-primary transition-colors flex items-center gap-2 font-medium">
-                    Initialization
-                    <ChevronRight className="w-4 h-4" />
-                  </span>
-                </button>
+                <div className="space-y-10 prose prose-invert prose-slate max-w-none">
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                      <Terminal className="w-5 h-5 text-primary" />
+                      System Requirements
+                    </h2>
+                    <ul className="list-disc pl-5 space-y-2 text-slate-400">
+                      <li><strong className="text-slate-200">Node.js:</strong> Version 18.0.0 or higher</li>
+                      <li><strong className="text-slate-200">Git:</strong> Installed and configured</li>
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Global Installation</h2>
+                    <CodeBlock code="npm install -g aico-ai" onCopy={copyCode} />
+                  </section>
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Table of Contents (On this page) */}
+            {/* TOC */}
             <aside className="w-56 hidden xl:block shrink-0 pt-4 sticky top-20 self-start">
               <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4">On this page</h4>
               <ul className="space-y-3 text-sm text-slate-400">
-                <li><a href="#" className="hover:text-primary transition-colors text-primary border-l-2 border-primary pl-3 -ml-[2px]">Requirements</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Global Installation</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Local Installation</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Troubleshooting</a></li>
+                {activePage === "Team Rules Guide" ? (
+                  <>
+                    <li><a href="#" className="hover:text-primary transition-colors text-primary border-l-2 border-primary pl-3 -ml-[2px]">Overview</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Quick Start</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Configuration</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Security Rules</a></li>
+                  </>
+                ) : (
+                  <>
+                    <li><a href="#" className="hover:text-primary transition-colors text-primary border-l-2 border-primary pl-3 -ml-[2px]">Requirements</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Global Installation</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Local Installation</a></li>
+                  </>
+                )}
               </ul>
-              
-              <div className="mt-10 pt-10 border-t border-white/5">
-                <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-white/10 hover:bg-white/5 text-slate-300">
-                  <ExternalLink className="w-3 h-3" />
-                  Edit on GitHub
-                </Button>
-              </div>
             </aside>
           </div>
         </ScrollArea>
       </main>
+    </div>
+  );
+}
+
+function CodeBlock({ code, language = "bash", onCopy }: { code: string, language?: string, onCopy: (c: string) => void }) {
+  return (
+    <div className="bg-[#1E293B] rounded-xl border border-white/5 overflow-hidden group">
+      <div className="px-4 py-2 bg-white/5 border-b border-white/5 flex items-center justify-between">
+        <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">{language}</span>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => onCopy(code)}
+          className="h-7 px-2 text-[10px] text-slate-400 hover:text-white"
+        >
+          <Copy className="w-3 h-3 mr-1" />
+          Copy
+        </Button>
+      </div>
+      <div className="p-5 font-mono text-sm overflow-x-auto whitespace-pre">
+        <div className="flex gap-3">
+          {language === "bash" && <span className="text-slate-600 select-none">$</span>}
+          <span className="text-primary">{code}</span>
+        </div>
+      </div>
     </div>
   );
 }
