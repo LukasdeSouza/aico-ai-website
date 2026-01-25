@@ -26,7 +26,7 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/5">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/assets/logo-shield.png" alt="Aico AI Logo" className="w-8 h-8 object-contain" />
+            <img src="/assets/aico-ai-logo-overall.png" alt="Aico AI Logo" className="w-18 h-18 object-contain" />
             <span className="font-display font-bold text-xl tracking-tight">Aico AI</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
@@ -57,7 +57,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="mb-8 flex justify-center"
           >
-            <img src="/assets/logo-shield.png" alt="Aico AI Shield" className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_30px_rgba(0,229,188,0.3)]" />
+            <img src="/assets/aico-ai-logo-withouth-text.png" alt="Aico AI Shield" className="w-24 h-24 md:w-64 md:h-64 object-contain drop-shadow-[0_0_30px_rgba(0,229,188,0.3)]" />
           </motion.div>
           
           <motion.h1 
@@ -87,11 +87,11 @@ export default function Home() {
             transition={{ delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Button size="lg" className="h-12 px-8 text-base bg-primary text-primary-foreground hover:bg-primary/90 font-semibold w-full sm:w-auto shadow-[0_0_20px_rgba(0,229,188,0.2)]">
+            <Button size="lg" className="h-12 px-8 text-base bg-primary text-primary-foreground hover:bg-primary/90 font-semibold hover:cursor-pointer w-full sm:w-auto shadow-[0_0_20px_rgba(0,229,188,0.2)]">
               Get Started
               <span className="ml-2 opacity-70 text-xs font-mono bg-black/20 px-2 py-0.5 rounded">npm install -g aico-ai</span>
             </Button>
-            <Button size="lg" variant="outline" className="h-12 px-8 text-base border-white/10 hover:bg-white/5 hover:text-white w-full sm:w-auto">
+            <Button size="lg" variant="outline" className="h-12 px-8 text-base hover:cursor-pointer border-white/10 hover:bg-white/5 hover:text-white w-full sm:w-auto">
               <SiGithub className="mr-2 w-5 h-5" />
               View on GitHub
             </Button>
