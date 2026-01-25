@@ -65,9 +65,11 @@ export default function Home() {
             <a href="https://github.com/LukasdeSouza/aico-ai" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-white transition-colors">
               <SiGithub className="w-5 h-5" />
             </a>
-            <Button className="hidden sm:flex bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
-              Get Started
-            </Button>
+            <Link href="/documentation">
+              <Button className="hidden sm:flex bg-primary text-primary-foreground hover:bg-primary/90 font-semibold cursor-pointer">
+                Get Started
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>
