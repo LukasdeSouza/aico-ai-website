@@ -4,7 +4,9 @@ import { SiGithub, SiGitlab, SiGnubash } from "react-icons/si";
 import { Check, Terminal, Play, Settings, GitBranch, Shield, Zap, Lock, Code2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 // Fade in animation variant
 const fadeIn = {
@@ -24,6 +26,14 @@ const stagger = {
 export default function Home() {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      easing: "ease-out-cubic",
+    });
+  }, []);
 
   const copyToClipboard = () => {
     const text = "npm install -g aico-ai";
@@ -127,74 +137,84 @@ export default function Home() {
       {/* Features Section */}
       <section id="features" className="py-24 bg-background relative">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
               Unleash Superior Code with <br />
               <span className="text-primary">Aico AI's Core Features</span>
             </h2>
           </div>
 
-          <motion.div
-            variants={stagger}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
+          <div 
             className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto"
           >
-            <FeatureCard
-              icon="/assets/icon-brain.png"
-              title="AI-Powered Code Review"
-              description="Semantic analysis, multi-provider AI, and one-click auto-fixes. Catches logic errors before they merge."
-            />
-            <FeatureCard
-              icon="/assets/icon-rules.png"
-              title="Custom Team Rules"
-              description="Define naming conventions, complexity limits, and enforce forbidden patterns across your entire team."
-            />
-            <FeatureCard
-              icon="/assets/icon-security.png"
-              title="Security Vulnerability Scanning"
-              description="Detect hardcoded secrets, SQL injection, XSS, and more with comprehensive CWE mapping."
-            />
-            <FeatureCard
-              icon="/assets/icon-cicd.png"
-              title="CI/CD & Git Hooks"
-              description="Automate reviews, integrate with GitHub Actions, GitLab CI, and Husky for pre-commit checks."
-            />
-          </motion.div>
+            <div data-aos="fade-up" data-aos-delay="100">
+              <FeatureCard
+                icon="/assets/icon-brain.png"
+                title="AI-Powered Code Review"
+                description="Semantic analysis, multi-provider AI, and one-click auto-fixes. Catches logic errors before they merge."
+              />
+            </div>
+            <div data-aos="fade-up" data-aos-delay="200">
+              <FeatureCard
+                icon="/assets/icon-rules.png"
+                title="Custom Team Rules"
+                description="Define naming conventions, complexity limits, and enforce forbidden patterns across your entire team."
+              />
+            </div>
+            <div data-aos="fade-up" data-aos-delay="300">
+              <FeatureCard
+                icon="/assets/icon-security.png"
+                title="Security Vulnerability Scanning"
+                description="Detect hardcoded secrets, SQL injection, XSS, and more with comprehensive CWE mapping."
+              />
+            </div>
+            <div data-aos="fade-up" data-aos-delay="400">
+              <FeatureCard
+                icon="/assets/icon-cicd.png"
+                title="CI/CD & Git Hooks"
+                description="Automate reviews, integrate with GitHub Actions, GitLab CI, and Husky for pre-commit checks."
+              />
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Quick Start Section */}
       <section id="quickstart" className="py-24 bg-card/30 border-y border-white/5">
         <div className="container mx-auto px-6 max-w-4xl">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">Get Started in Minutes</h2>
             <p className="text-muted-foreground text-lg">Aico AI integrates seamlessly into your existing development workflow.</p>
           </div>
 
           <div className="space-y-8">
-            <Step
-              number="1"
-              title="Install Aico AI"
-              description="Globally recommended for easy access."
-              icon={<Terminal className="w-6 h-6 text-primary" />}
-              code="npm install -g aico-ai"
-            />
-            <Step
-              number="2"
-              title="Initialize Aico"
-              description="Run our interactive wizard to configure your AI provider and settings."
-              icon={<Settings className="w-6 h-6 text-primary" />}
-              code="aico init"
-            />
-            <Step
-              number="3"
-              title="Start Reviewing & Protecting"
-              description="Stage your changes and let Aico AI do the heavy lifting."
-              icon={<Play className="w-6 h-6 text-primary" />}
-              code={`git add .\naico review`}
-            />
+            <div data-aos="fade-right" data-aos-delay="100">
+              <Step
+                number="1"
+                title="Install Aico AI"
+                description="Globally recommended for easy access."
+                icon={<Terminal className="w-6 h-6 text-primary" />}
+                code="npm install -g aico-ai"
+              />
+            </div>
+            <div data-aos="fade-right" data-aos-delay="200">
+              <Step
+                number="2"
+                title="Initialize Aico"
+                description="Run our interactive wizard to configure your AI provider and settings."
+                icon={<Settings className="w-6 h-6 text-primary" />}
+                code="aico init"
+              />
+            </div>
+            <div data-aos="fade-right" data-aos-delay="300">
+              <Step
+                number="3"
+                title="Start Reviewing & Protecting"
+                description="Stage your changes and let Aico AI do the heavy lifting."
+                icon={<Play className="w-6 h-6 text-primary" />}
+                code={`git add .\naico review`}
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -202,7 +222,7 @@ export default function Home() {
       {/* Comparison Section */}
       <section id="comparison" className="py-24 bg-background">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-up">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
               Why Aico AI? <br />
               <span className="text-muted-foreground text-3xl md:text-4xl font-normal">Beyond Traditional Tooling</span>
@@ -211,31 +231,37 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <ComparisonColumn
-              title="Vs. IDE Extensions"
-              points={[
-                { title: "Team-First", desc: "Enforce shared standards across all developers." },
-                { title: "IDE-Agnostic", desc: "Works with any editor, everywhere." },
-                { title: "Enforceable", desc: "Block commits/pushes to maintain quality." }
-              ]}
-            />
-            <ComparisonColumn
-              title="Vs. Traditional Linters"
-              points={[
-                { title: "AI-Powered", desc: "Understands code context and intent, not just syntax." },
-                { title: "Semantic Analysis", desc: "Catches deeper issues linters miss." },
-                { title: "Built-in Security", desc: "Integrated vulnerability detection, not just style." }
-              ]}
-              highlight
-            />
-            <ComparisonColumn
-              title="Vs. Code Review Platforms"
-              points={[
-                { title: "Lightweight & Fast", desc: "No server setup, local execution, instant feedback." },
-                { title: "Flexible AI", desc: "Choose your provider (Groq, OpenAI) or Ollama for data control." },
-                { title: "Cost Effective", desc: "Pay for your own tokens, no per-seat SaaS markup." }
-              ]}
-            />
+            <div data-aos="zoom-in" data-aos-delay="100">
+              <ComparisonColumn
+                title="Vs. IDE Extensions"
+                points={[
+                  { title: "Team-First", desc: "Enforce shared standards across all developers." },
+                  { title: "IDE-Agnostic", desc: "Works with any editor, everywhere." },
+                  { title: "Enforceable", desc: "Block commits/pushes to maintain quality." }
+                ]}
+              />
+            </div>
+            <div data-aos="zoom-in" data-aos-delay="200">
+              <ComparisonColumn
+                title="Vs. Traditional Linters"
+                points={[
+                  { title: "AI-Powered", desc: "Understands code context and intent, not just syntax." },
+                  { title: "Semantic Analysis", desc: "Catches deeper issues linters miss." },
+                  { title: "Built-in Security", desc: "Integrated vulnerability detection, not just style." }
+                ]}
+                highlight
+              />
+            </div>
+            <div data-aos="zoom-in" data-aos-delay="300">
+              <ComparisonColumn
+                title="Vs. Code Review Platforms"
+                points={[
+                  { title: "Lightweight & Fast", desc: "No server setup, local execution, instant feedback." },
+                  { title: "Flexible AI", desc: "Choose your provider (Groq, OpenAI) or Ollama for data control." },
+                  { title: "Cost Effective", desc: "Pay for your own tokens, no per-seat SaaS markup." }
+                ]}
+              />
+            </div>
           </div>
         </div>
       </section>
