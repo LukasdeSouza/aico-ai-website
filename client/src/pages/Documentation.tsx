@@ -58,7 +58,7 @@ const sidebarItems = [
 export default function Documentation() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const activePage = location.includes("team-rules") ? "Team Rules Guide" : "Installation";
+  const activePage = location.includes("team-rules") ? "Team Rules Guide" : (location.includes("welcome") || location === "/documentation" ? "Welcome" : "Installation");
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -92,18 +92,25 @@ export default function Documentation() {
                   <span>{section.title}</span>
                 </div>
                 <div className="space-y-1">
-                  {section.items.map((item, itemIdx) => (
-                    <button
-                      key={itemIdx}
-                      onClick={() => setLocation(item === "Team Rules Guide" ? "/documentation/team-rules" : "/documentation")}
-                      className={`w-full text-left px-2 py-1.5 rounded-md text-sm transition-colors flex items-center justify-between group ${
-                        item === activePage ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 hover:text-white"
-                      }`}
-                    >
-                      {item}
-                      <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${item === activePage ? "opacity-100" : ""}`} />
-                    </button>
-                  ))}
+                  {section.items.map((item, itemIdx) => {
+                    let href = "/documentation";
+                    if (item === "Team Rules Guide") href = "/documentation/team-rules";
+                    if (item === "Welcome") href = "/documentation/welcome";
+                    if (item === "Installation") href = "/documentation/installation";
+                    
+                    return (
+                      <button
+                        key={itemIdx}
+                        onClick={() => setLocation(href)}
+                        className={`w-full text-left px-2 py-1.5 rounded-md text-sm transition-colors flex items-center justify-between group ${
+                          item === activePage ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 hover:text-white"
+                        }`}
+                      >
+                        {item}
+                        <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${item === activePage ? "opacity-100" : ""}`} />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -136,7 +143,86 @@ export default function Documentation() {
         {/* Content */}
         <ScrollArea className="flex-1">
           <div className="max-w-4xl mx-auto px-8 py-12 flex gap-12">
-            {activePage === "Team Rules Guide" ? (
+            {activePage === "Welcome" ? (
+              <div className="flex-1">
+                <div className="mb-10">
+                  <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                    <span>Introduction</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-primary">Welcome</span>
+                  </nav>
+                  <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">Welcome to Aico AI</h1>
+                  <p className="text-lg text-slate-400 leading-relaxed">
+                    Aico AI is a next-generation code quality gatekeeper designed for modern development teams. It goes beyond simple linting by leveraging advanced AI to understand the semantic intent and context of your code.
+                  </p>
+                </div>
+
+                <div className="space-y-10 prose prose-invert prose-slate max-w-none">
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">What makes Aico AI different?</h2>
+                    <p className="text-slate-400">Traditional tools focus on syntax and style. Aico AI focuses on <span className="text-white font-medium">correctness, security, and team alignment.</span></p>
+                    
+                    <div className="grid sm:grid-cols-2 gap-4 mt-8">
+                      <div className="p-4 rounded-xl border border-white/5 bg-white/5">
+                        <h4 className="text-primary font-bold mb-2 flex items-center gap-2">
+                          <Cpu className="w-4 h-4" />
+                          Context-Aware
+                        </h4>
+                        <p className="text-xs text-slate-400 m-0">AI reviews that actually understand logic flows, not just missing semicolons.</p>
+                      </div>
+                      <div className="p-4 rounded-xl border border-white/5 bg-white/5">
+                        <h4 className="text-primary font-bold mb-2 flex items-center gap-2">
+                          <Shield className="w-4 h-4" />
+                          Security-First
+                        </h4>
+                        <p className="text-xs text-slate-400 m-0">Built-in vulnerability scanning for XSS, SQLi, and hardcoded secrets.</p>
+                      </div>
+                      <div className="p-4 rounded-xl border border-white/5 bg-white/5">
+                        <h4 className="text-primary font-bold mb-2 flex items-center gap-2">
+                          <Layers className="w-4 h-4" />
+                          Team Standards
+                        </h4>
+                        <p className="text-xs text-slate-400 m-0">Enforce your team's specific naming and architecture rules with ease.</p>
+                      </div>
+                      <div className="p-4 rounded-xl border border-white/5 bg-white/5">
+                        <h4 className="text-primary font-bold mb-2 flex items-center gap-2">
+                          <Zap className="w-4 h-4" />
+                          Zero Config
+                        </h4>
+                        <p className="text-xs text-slate-400 m-0">Get started in seconds with intelligent defaults that adapt to your stack.</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Core Principles</h2>
+                    <ul className="space-y-4 text-slate-400">
+                      <li className="flex gap-3">
+                        <span className="text-primary font-bold">01.</span>
+                        <div>
+                          <strong className="text-white block">Speed without compromise</strong>
+                          Local execution and multi-provider AI support (OpenAI, Groq, Ollama) ensure instant feedback.
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="text-primary font-bold">02.</span>
+                        <div>
+                          <strong className="text-white block">Developer Experience</strong>
+                          Intuitive CLI and seamless integration with GitHub/GitLab CI/CD pipelines.
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="text-primary font-bold">03.</span>
+                        <div>
+                          <strong className="text-white block">Privacy Centric</strong>
+                          Full support for local LLMs via Ollama for teams with strict data security requirements.
+                        </div>
+                      </li>
+                    </ul>
+                  </section>
+                </div>
+              </div>
+            ) : activePage === "Team Rules Guide" ? (
               <div className="flex-1">
                 <div className="mb-10">
                   <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
