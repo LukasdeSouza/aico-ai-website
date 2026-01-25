@@ -96,7 +96,7 @@ export default function Home() {
             className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6 leading-tight"
           >
             Your Intelligent Code <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400 font-serif italic">Quality Gatekeeper</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">Quality Gatekeeper</span>
           </motion.h1>
 
           <motion.p
