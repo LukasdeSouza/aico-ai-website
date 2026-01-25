@@ -22,7 +22,7 @@ const stagger = {
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary">
-      
+
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/5">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
@@ -36,7 +36,7 @@ export default function Home() {
             <a href="#comparison" className="hover:text-primary transition-colors">Comparison</a>
           </div>
           <div className="flex items-center gap-4">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-white transition-colors">
+            <a href="https://github.com/LukasdeSouza/aico-ai" target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-white transition-colors">
               <SiGithub className="w-5 h-5" />
             </a>
             <Button className="hidden sm:flex bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
@@ -50,7 +50,7 @@ export default function Home() {
       <section className="pt-32 pb-20 md:pt-40 md:pb-32 px-6 relative overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/10 blur-[120px] rounded-full pointer-events-none opacity-50" />
-        
+
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -60,8 +60,8 @@ export default function Home() {
           >
             <img src="/assets/aico-ai-logo-withouth-text.png" alt="Aico AI Shield" className="w-24 h-24 md:w-64 md:h-64 object-contain drop-shadow-[0_0_30px_rgba(0,229,188,0.3)]" />
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             variants={fadeIn}
             initial="initial"
             animate="animate"
@@ -70,8 +70,8 @@ export default function Home() {
             Your Intelligent Code <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">Quality Gatekeeper</span>
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             variants={fadeIn}
             initial="initial"
             animate="animate"
@@ -80,8 +80,8 @@ export default function Home() {
           >
             Elevate your code quality, security, and consistency with AI-powered reviews, custom team rules, and robust vulnerability scanning. Seamlessly integrated into your workflow.
           </motion.p>
-          
-          <motion.div 
+
+          <motion.div
             variants={fadeIn}
             initial="initial"
             animate="animate"
@@ -92,7 +92,8 @@ export default function Home() {
               Get Started
               <span className="ml-2 opacity-70 text-xs font-mono bg-black/20 px-2 py-0.5 rounded">npm install -g aico-ai</span>
             </Button>
-            <Button size="lg" variant="outline" className="h-12 px-8 text-base hover:cursor-pointer border-white/10 hover:bg-white/5 hover:text-white w-full sm:w-auto">
+            <Button size="lg" variant="outline" className="h-12 px-8 text-base hover:cursor-pointer border-white/10 hover:bg-white/5 hover:text-white w-full sm:w-auto"
+              onClick={() => window.open("https://github.com/LukasdeSouza/aico-ai", '_blank')}>
               <SiGithub className="mr-2 w-5 h-5" />
               View on GitHub
             </Button>
@@ -110,29 +111,29 @@ export default function Home() {
             </h2>
           </div>
 
-          <motion.div 
+          <motion.div
             variants={stagger}
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
             className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto"
           >
-            <FeatureCard 
+            <FeatureCard
               icon="/assets/icon-brain.png"
               title="AI-Powered Code Review"
               description="Semantic analysis, multi-provider AI, and one-click auto-fixes. Catches logic errors before they merge."
             />
-            <FeatureCard 
+            <FeatureCard
               icon="/assets/icon-rules.png"
               title="Custom Team Rules"
               description="Define naming conventions, complexity limits, and enforce forbidden patterns across your entire team."
             />
-            <FeatureCard 
+            <FeatureCard
               icon="/assets/icon-security.png"
               title="Security Vulnerability Scanning"
               description="Detect hardcoded secrets, SQL injection, XSS, and more with comprehensive CWE mapping."
             />
-            <FeatureCard 
+            <FeatureCard
               icon="/assets/icon-cicd.png"
               title="CI/CD & Git Hooks"
               description="Automate reviews, integrate with GitHub Actions, GitLab CI, and Husky for pre-commit checks."
@@ -150,23 +151,23 @@ export default function Home() {
           </div>
 
           <div className="space-y-8">
-            <Step 
-              number="1" 
-              title="Install Aico AI" 
+            <Step
+              number="1"
+              title="Install Aico AI"
               description="Globally recommended for easy access."
               icon={<Terminal className="w-6 h-6 text-primary" />}
               code="npm install -g aico-ai"
             />
-            <Step 
-              number="2" 
-              title="Initialize Aico" 
+            <Step
+              number="2"
+              title="Initialize Aico"
               description="Run our interactive wizard to configure your AI provider and settings."
               icon={<Settings className="w-6 h-6 text-primary" />}
               code="aico init"
             />
-            <Step 
-              number="3" 
-              title="Start Reviewing & Protecting" 
+            <Step
+              number="3"
+              title="Start Reviewing & Protecting"
               description="Stage your changes and let Aico AI do the heavy lifting."
               icon={<Play className="w-6 h-6 text-primary" />}
               code={`git add .\naico review`}
@@ -187,7 +188,7 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <ComparisonColumn 
+            <ComparisonColumn
               title="Vs. IDE Extensions"
               points={[
                 { title: "Team-First", desc: "Enforce shared standards across all developers." },
@@ -195,7 +196,7 @@ export default function Home() {
                 { title: "Enforceable", desc: "Block commits/pushes to maintain quality." }
               ]}
             />
-            <ComparisonColumn 
+            <ComparisonColumn
               title="Vs. Traditional Linters"
               points={[
                 { title: "AI-Powered", desc: "Understands code context and intent, not just syntax." },
@@ -204,7 +205,7 @@ export default function Home() {
               ]}
               highlight
             />
-            <ComparisonColumn 
+            <ComparisonColumn
               title="Vs. Code Review Platforms"
               points={[
                 { title: "Lightweight & Fast", desc: "No server setup, local execution, instant feedback." },
@@ -220,23 +221,23 @@ export default function Home() {
       <footer className="py-12 border-t border-white/5 bg-background">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <img src="/assets/logo-shield.png" alt="Aico AI" className="w-6 h-6 opacity-80" />
-            <span className="text-muted-foreground font-display font-medium">Aico AI</span>
+            <img src="/assets/aico-ai-logo-overall.png" alt="Aico AI" className="w-32 h-32 opacity-80" />
+            {/* <span className="text-muted-foreground font-display font-medium">Aico AI</span> */}
           </div>
-          
+
           <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
             <Link href="/documentation" className="hover:text-primary transition-colors">Documentation</Link>
-            <a href="#" className="hover:text-primary transition-colors">Report an Issue</a>
-            <a href="#" className="hover:text-primary transition-colors">Contact Us</a>
+            <a href="https://github.com/LukasdeSouza/aico-ai/issues" className="hover:text-primary transition-colors">Report an Issue</a>
+            <a href="mailto:lucasdesouzasilva112@gmail.com" className="hover:text-primary transition-colors">Contact Us</a>
           </div>
 
           <div className="flex items-center gap-4 text-muted-foreground">
             <span className="text-xs">License: ISC</span>
-            <a href="#" className="hover:text-white transition-colors"><SiGithub className="w-5 h-5" /></a>
+            <a href="https://github.com/LukasdeSouza/aico-ai" className="hover:text-white transition-colors"><SiGithub className="w-5 h-5" /></a>
           </div>
         </div>
         <div className="text-center text-xs text-white/20 mt-8">
-          Built with ❤️ by Lucas Silva
+          Built with ❤️ by @deveprogramar
         </div>
       </footer>
     </div>
@@ -247,17 +248,17 @@ export default function Home() {
 
 function FeatureCard({ icon, title, description }: { icon: string, title: string, description: string }) {
   return (
-    <motion.div 
+    <motion.div
       variants={fadeIn}
       className="group bg-card hover:bg-card/80 border border-white/5 hover:border-primary/50 transition-all duration-300 p-8 rounded-2xl relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      
+
       <div className="relative z-10 flex flex-col h-full">
         <div className="mb-6 w-16 h-16 rounded-xl bg-background/50 flex items-center justify-center border border-white/5 group-hover:scale-105 transition-transform duration-300">
-           <img src={icon} alt={title} className="w-10 h-10 object-contain" />
+          <img src={icon} alt={title} className="w-10 h-10 object-contain" />
         </div>
-        
+
         <h3 className="text-xl font-display font-bold text-white mb-3 group-hover:text-primary transition-colors">{title}</h3>
         <p className="text-muted-foreground leading-relaxed">{description}</p>
       </div>
@@ -267,7 +268,7 @@ function FeatureCard({ icon, title, description }: { icon: string, title: string
 
 function Step({ number, title, description, icon, code }: { number: string, title: string, description: string, icon: React.ReactNode, code: string }) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
@@ -279,7 +280,7 @@ function Step({ number, title, description, icon, code }: { number: string, titl
         </div>
         <div className="w-px h-full bg-white/10 my-2 absolute md:static left-6 top-12 -z-0 md:hidden" />
       </div>
-      
+
       <div className="flex-grow grid md:grid-cols-2 gap-6 items-center">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -288,7 +289,7 @@ function Step({ number, title, description, icon, code }: { number: string, titl
           </div>
           <p className="text-muted-foreground">{description}</p>
         </div>
-        
+
         <div className="bg-[#0B1120] rounded-lg border border-white/5 p-4 font-mono text-sm shadow-inner relative group">
           <div className="absolute top-3 right-3 flex gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/20" />
@@ -313,9 +314,9 @@ function ComparisonColumn({ title, points, highlight = false }: { title: string,
   return (
     <div className={`p-8 rounded-2xl border ${highlight ? 'bg-card border-primary/30 relative' : 'bg-transparent border-transparent'} transition-all`}>
       {highlight && <div className="absolute inset-0 bg-primary/5 rounded-2xl pointer-events-none" />}
-      
+
       <h3 className="text-2xl font-display font-bold text-white mb-8 border-b border-white/10 pb-4">{title}</h3>
-      
+
       <ul className="space-y-6 relative z-10">
         {points.map((point, i) => (
           <li key={i} className="flex gap-3 items-start">

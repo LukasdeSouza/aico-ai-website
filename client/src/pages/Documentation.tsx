@@ -108,7 +108,7 @@ export default function Documentation() {
               v1.0.4
             </Button>
             <Separator orientation="vertical" className="h-4 bg-white/10" />
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors">
+            <a href="https://github.com/LukasdeSouza/aico-ai" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition-colors">
               <Github className="w-5 h-5" />
             </a>
           </div>
