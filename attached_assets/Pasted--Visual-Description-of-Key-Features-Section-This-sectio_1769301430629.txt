@@ -1,0 +1,84 @@
+
+Visual Description of Key Features Section:
+This section presents four key features in a clean, dark-themed grid layout. The background is a deep charcoal blue. The main heading, "Unleash Superior Code with Aco Aico AI's Core Features," is in a large, bold white sans-serif font. Below this, four rounded rectangular cards are arranged in a 2x2 grid, each with a slightly lighter dark gray background.
+Card 1 (Top Left): AI-Powered Code Review
+Icon: A teal line-art illustration of a brain with a magnifying glass over it.
+Title: "AI-Powered Code Review" in white.
+Description: "Semantic analysis, multi-provider AI, and one-click auto-fixes." in light gray.
+Card 2 (Top Right): Custom Team Rules
+Icon: A teal line-art illustration of a shield with a gear icon and a checklist.
+Title: "Custom Team Rules" in white.
+Description: "Define naming conventions, complexity limits, and enforce forbidden patterns." in light gray.
+Card 3 (Bottom Left): Security Vulnerability Scanning
+Icon: A teal line-art illustration of a spiderweb inside a shield with a lock icon.
+Title: "Security Vulnerability Scanning" in white.
+Description: "Detect hardcoded secrets, SQL injection, XSS, and more with CWE mapping." in light gray.
+Card 4 (Bottom Right): CI/CD & Git Hooks
+Icon: A teal line-art illustration of two arrows pointing to a shield, connected by lines, with smaller git hook icons.
+Title: "CI/CD & Git Hooks" in white.
+Description: "Automate reviews, integrate with Gitewith GitHub Actions, Gitlab CI, and Husky." in light gray.
+The overall design is clear, uses consistent iconography, and the teal accents effectively highlight the features against the dark background.
+3. How It Works / Quick Start Section
+Visuals:
+Clear numbered steps.
+Each step has a simple, relevant icon (e.g., git icon, config icon, play icon).
+Code blocks for npm install and aico init in a distinct monospace font, within a slightly lighter dark gray background, resembling a terminal.
+The terminal code blocks use the teal accent for commands and output, white for general text.
+Copywriting:
+Headline:
+Get Started in Minutes.
+(Keep it direct and promise quick value)
+Sub-headline:
+Aico AI integrates seamlessly into your existing development workflow. Here's how to begin:
+Step 1: Install Aico AI
+Globally recommended for easy access.
+code
+Bash
+npm install -g aico-ai
+Step 2: Initialize Aico
+Run our interactive wizard to configure your AI provider and settings.
+code
+Bash
+aico init
+Step 3: Start Reviewing & Protecting
+Stage your changes and let Aico AI do the heavy lifting.
+code
+Bash
+git add .
+aico review
+Visual Description of Why Choose Aico Section:
+This section uses a dark background to present Aico AI's advantages over competing solutions. The main heading "Why Aico AI? Beyond Traditional Tooling" is in a large, bold white sans-serif font. A light gray sub-headline follows: "Discover how Aico AI offers a superior, integrated solution for modern development teams."
+Below this, three distinct columns compare Aico AI to different categories of tools:
+Column 1: Vs. IDE Extensions
+Sub-heading: "Vs. IDE Extensions" in a bold white font.
+Bullet points: Each point starts with a teal checkmark icon followed by a white bolded benefit and then a light gray descriptive text.
+"Team-First: Enforce shared standards across all developers."
+"IDE-Agnostic: Works with any editor, everywhere."
+"Enforceable: Block commits/pushes to maintain quality."
+Column 2: Vs. Traditional Linters
+Sub-heading: "Vs. Traditional Linters" in a bold white font.
+Bullet points: Similar to the first column.
+"AI-Powered: Understands code context and intent, not just syntax."
+"Semantic Analysis: Catches deeper issues linters miss."
+"Built-in Security: Integrated vulnerability detection, not just style."
+Column 3: Vs. Code Review Platforms
+Sub-heading: "Vs. Code Review Platforms" in a bold white font.
+Bullet points: Similar to the first two columns.
+"Lightweight & Fast: No server setup, local execution, instant feedback, instant Gemini)"
+"Flexible AI: Choose your provider (Groq, OpenAI) with Ollama for complete data control)"
+The design is clean, organized, and uses the teal checkmarks effectively to highlight the benefits against the dark backdrop.
+5. Footer / Support & Community
+Visuals:
+Minimal text, links to GitHub, docs, email.
+Small social icons (GitHub star, email icon).
+Light gray text on dark background.
+Copywriting:
+Headline (Optional, if space):
+Join the Aico AI Community.
+Body/Links:
+Built with ❤️ by Lucas Silva.
+Star on GitHub
+Read the Documentation
+Report an Issue
+Contact Us
+License: ISC
