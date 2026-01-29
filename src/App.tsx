@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Documentation from "@/pages/Documentation";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react"
 
 function Router() {
   return (
@@ -16,6 +16,7 @@ function Router() {
       <Route path="/documentation/welcome" component={Documentation} />
       <Route path="/documentation/installation" component={Documentation} />
       <Route path="/documentation/team-rules" component={Documentation} />
+      <Route path="/documentation/ci-cd-integration" component={Documentation} />
       <Route component={NotFound} />
     </Switch>
   );

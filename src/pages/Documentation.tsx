@@ -58,7 +58,7 @@ const sidebarItems = [
 export default function Documentation() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const activePage = location.includes("team-rules") ? "Team Rules Guide" : (location.includes("welcome") || location === "/documentation" ? "Welcome" : "Installation");
+  const activePage = location.includes("team-rules") ? "Team Rules Guide" : location.includes("ci-cd-integration") ? "CI/CD Integration" : (location.includes("welcome") || location === "/documentation" ? "Welcome" : "Installation");
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -97,6 +97,7 @@ export default function Documentation() {
                     if (item === "Team Rules Guide") href = "/documentation/team-rules";
                     if (item === "Welcome") href = "/documentation/welcome";
                     if (item === "Installation") href = "/documentation/installation";
+                    if (item === "CI/CD Integration") href = "/documentation/ci-cd-integration";
                     
                     return (
                       <button
@@ -237,26 +238,24 @@ export default function Documentation() {
                 </div>
 
                 <div className="space-y-10 prose prose-invert prose-slate max-w-none">
-                  <section className="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-8">
-                    <div className="flex gap-4">
-                      <Info className="w-6 h-6 text-primary shrink-0" />
-                      <p className="text-sm text-slate-300 m-0">
-                        Team Rules allow you to define and enforce custom code quality standards that are specific to your team or project. Unlike generic linting tools, Aico's Team Rules integrate with AI-powered reviews to provide context-aware feedback.
-                      </p>
-                    </div>
+                  <section>
+                    <h2 id="overview" className="text-2xl font-bold text-white mb-4">Overview</h2>
+                    <p>
+                      Team Rules allow you to define and enforce custom code quality standards that are specific to your team or project. Unlike generic linting tools, Aico's Team Rules integrate with AI-powered reviews to provide context-aware feedback that aligns with your team's conventions.
+                    </p>
                   </section>
 
                   <section>
-                    <h2 className="text-2xl font-bold text-white mb-4">Quick Start</h2>
-                    <div className="space-y-6">
+                    <h2 id="quick-start" className="text-2xl font-bold text-white mb-4">Quick Start</h2>
+                    <div className="space-y-8">
                       <div>
                         <h3 className="text-lg font-semibold text-slate-200 mb-2">1. Initialize Team Rules</h3>
                         <CodeBlock code="aico rules init" onCopy={copyCode} />
                         <p className="text-sm text-slate-400 mt-2">This creates a <code className="text-primary bg-primary/10 px-1 rounded">.aico/rules.json</code> file with a default template.</p>
                       </div>
-
                       <div>
                         <h3 className="text-lg font-semibold text-slate-200 mb-2">2. Customize Your Rules</h3>
+                        <p className="mb-2">Edit <code className="text-primary bg-primary/10 px-1 rounded">.aico/rules.json</code> to match your team's standards:</p>
                         <CodeBlock 
                           language="json"
                           code={`{
@@ -270,9 +269,185 @@ export default function Documentation() {
     "complexity": {
       "maxFunctionLength": 50,
       "maxCyclomaticComplexity": 10
+    },
+    "forbidden": [
+      {
+        "pattern": "console\\\\.log",
+        "severity": "warn",
+        "message": "Remove console.log before committing"
+      }
+    ]
+  }
+}`} 
+                          onCopy={copyCode} 
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-200 mb-2">3. Validate Your Code</h3>
+                        <CodeBlock 
+                          code={`# Validate staged changes
+aico rules validate
+
+# Or run during normal review (rules are automatically applied)
+aico review`} 
+                          onCopy={copyCode} 
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-200 mb-2">4. List Active Rules</h3>
+                        <CodeBlock code="aico rules list" onCopy={copyCode} />
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h2 id="configuration-reference" className="text-2xl font-bold text-white mb-4">📋 Configuration Reference</h2>
+                    <h3 className="text-lg font-semibold text-slate-200 mb-2">Complete Configuration Structure</h3>
+                    <CodeBlock 
+                      language="json"
+                      code={`{
+  "version": "1.0",
+  "description": "Team code quality standards",
+  "rules": {
+    "naming": { /* Naming conventions */ },
+    "complexity": { /* Complexity limits */ },
+    "forbidden": [ /* Forbidden patterns */ ],
+    "required": [ /* Required patterns */ ],
+    "security": { /* Security rules */ }
+  },
+  "ignore": [ /* Files to ignore */ ],
+  "teamStandards": { /* Team-specific standards */ },
+  "aiPromptEnhancement": { /* AI integration */ }
+}`} 
+                      onCopy={copyCode} 
+                    />
+                  </section>
+
+                  <section>
+                    <h2 id="forbidden-patterns" className="text-2xl font-bold text-white mb-4">Forbidden Patterns</h2>
+                    <p>Block specific code patterns using JavaScript-compatible regex:</p>
+                    <CodeBlock 
+                      language="json"
+                      code={`{
+  "rules": {
+    "forbidden": [
+      {
+        "pattern": "console\\\\.log",
+        "severity": "warn",
+        "message": "Remove console.log before committing.",
+        "exclude": ["*.test.js", "*.spec.ts"]
+      },
+      {
+        "pattern": "debugger",
+        "severity": "error",
+        "message": "Remove debugger statement"
+      }
+    ]
+  }
+}`} 
+                      onCopy={copyCode} 
+                    />
+                  </section>
+
+                  <section>
+                    <h2 id="security-rules" className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-primary" />
+                      Security Rules
+                    </h2>
+                    <p>Enable built-in security checks to catch common vulnerabilities:</p>
+                    <CodeBlock 
+                      language="json"
+                      code={`{
+  "rules": {
+    "security": {
+      "noHardcodedSecrets": true,
+      "noEval": true,
+      "noInnerHTML": true,
+      "requireInputValidation": true
     }
   }
 }`} 
+                      onCopy={copyCode} 
+                    />
+                  </section>
+
+                  <section>
+                    <h2 id="best-practices" className="text-2xl font-bold text-white mb-4">Best Practices</h2>
+                    <ul className="space-y-4 text-slate-400">
+                      <li className="flex gap-3">
+                        <span className="text-primary font-bold">01.</span>
+                        <div>
+                          <strong className="text-white block">Start Simple</strong>
+                          Begin with a few critical rules (like forbidding <code className="text-xs bg-white/10 px-1 rounded">console.log</code> and <code className="text-xs bg-white/10 px-1 rounded">debugger</code>) and expand gradually.
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="text-primary font-bold">02.</span>
+                        <div>
+                          <strong className="text-white block">Use Appropriate Severity</strong>
+                          Use <code className="text-xs bg-white/10 px-1 rounded">error</code> for critical issues that must block commits, and <code className="text-xs bg-white/10 px-1 rounded">warn</code> for best practices.
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="text-primary font-bold">03.</span>
+                        <div>
+                          <strong className="text-white block">Version Control Your Rules</strong>
+                          Commit <code className="text-xs bg-white/10 px-1 rounded">.aico/rules.json</code> to your repository so the entire team uses the same standards.
+                        </div>
+                      </li>
+                    </ul>
+                  </section>
+                </div>
+              </div>
+            ) : activePage === "CI/CD Integration" ? (
+              <div className="flex-1">
+                <div className="mb-10">
+                  <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                    <span>Core Features</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-primary">CI/CD Integration</span>
+                  </nav>
+                  <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">CI/CD Integration Guide</h1>
+                  <p className="text-lg text-slate-400 leading-relaxed">
+                    Complete guide for integrating Aico AI into your CI/CD pipelines to automate code quality checks.
+                  </p>
+                </div>
+
+                <div className="space-y-10 prose prose-invert prose-slate max-w-none">
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Overview</h2>
+                    <p className="text-slate-400">
+                      The <code className="text-primary bg-primary/10 px-1 rounded">aico ci</code> command enables automated code quality checks in CI/CD pipelines with:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-2 text-slate-400 mt-4">
+                      <li><strong className="text-slate-200">Multiple output formats</strong> (JSON, XML, GitHub Actions, Text)</li>
+                      <li><strong className="text-slate-200">Configurable exit codes</strong> (fail on errors, warnings, or specific severity)</li>
+                      <li><strong className="text-slate-200">File output support</strong> (save reports for artifacts)</li>
+                      <li><strong className="text-slate-200">Severity filtering</strong> (focus on specific issue types)</li>
+                      <li><strong className="text-slate-200">Team rules integration</strong> (combines AI review + custom rules)</li>
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Quick Start</h2>
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-200 mb-2">Basic Usage</h3>
+                        <CodeBlock 
+                          code={`# Run CI review with default text output
+aico ci
+
+# Run with JSON output
+aico ci --format json
+
+# Save report to file
+aico ci --format json --output report.json
+
+# Fail pipeline on errors
+aico ci --fail-on-error
+
+# Fail pipeline on warnings or errors
+aico ci --fail-on-warn`} 
                           onCopy={copyCode} 
                         />
                       </div>
@@ -280,24 +455,140 @@ export default function Documentation() {
                   </section>
 
                   <section>
-                    <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                      <Shield className="w-5 h-5 text-primary" />
-                      Security Rules
-                    </h2>
-                    <p className="mb-4">Enable built-in security checks to catch vulnerabilities early:</p>
+                    <h2 className="text-2xl font-bold text-white mb-4">Command Reference</h2>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm text-slate-400 border-collapse">
+                        <thead>
+                          <tr className="border-b border-white/10">
+                            <th className="py-3 px-4 text-white font-semibold">Option</th>
+                            <th className="py-3 px-4 text-white font-semibold">Description</th>
+                            <th className="py-3 px-4 text-white font-semibold">Example</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-white/5">
+                            <td className="py-3 px-4 font-mono text-primary">--format &lt;type&gt;</td>
+                            <td className="py-3 px-4">Output format: json, xml, github, text</td>
+                            <td className="py-3 px-4 font-mono">--format json</td>
+                          </tr>
+                          <tr className="border-b border-white/5">
+                            <td className="py-3 px-4 font-mono text-primary">--output &lt;file&gt;</td>
+                            <td className="py-3 px-4">Save output to file</td>
+                            <td className="py-3 px-4 font-mono">--output report.json</td>
+                          </tr>
+                          <tr className="border-b border-white/5">
+                            <td className="py-3 px-4 font-mono text-primary">--fail-on-error</td>
+                            <td className="py-3 px-4">Exit with code 1 if errors found</td>
+                            <td className="py-3 px-4 font-mono">--fail-on-error</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">GitHub Actions Integration</h2>
+                    <p className="text-slate-400 mb-4">Copy <code className="text-primary bg-primary/10 px-1 rounded">.github/workflows/aico-review.yml</code> to your repository:</p>
                     <CodeBlock 
-                      language="json"
-                      code={`"security": {
-  "noHardcodedSecrets": true,
-  "noEval": true,
-  "noInnerHTML": true,
-  "requireInputValidation": true
-}`} 
+                      language="yaml"
+                      code={`name: Aico Code Review
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install Aico AI
+        run: npm install -g aico-ai
+      
+      - name: Run Aico Review
+        env:
+          GROQ_API_KEY: \${{ secrets.GROQ_API_KEY }}
+        run: |
+          git add -A
+          aico ci --format json --output aico-report.json --fail-on-error
+      
+      - name: Upload Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: aico-report
+          path: aico-report.json`} 
                       onCopy={copyCode} 
                     />
-                    <ul className="mt-4 space-y-2 text-sm text-slate-400">
-                      <li>• <strong className="text-slate-200">noHardcodedSecrets:</strong> Detects API keys and passwords</li>
-                      <li>• <strong className="text-slate-200">noEval:</strong> Blocks dangerous eval() usage</li>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">GitLab CI Integration</h2>
+                    <p className="text-slate-400 mb-4">Copy <code className="text-primary bg-primary/10 px-1 rounded">.gitlab-ci.yml</code> to your repository:</p>
+                    <CodeBlock 
+                      language="yaml"
+                      code={`stages:
+  - code-quality
+
+aico-review:
+  stage: code-quality
+  image: node:18
+  
+  before_script:
+    - npm install -g aico-ai
+  
+  script:
+    - git add -A
+    - aico ci --format json --output aico-report.json --fail-on-error
+  
+  artifacts:
+    when: always
+    paths:
+      - aico-report.json
+    reports:
+      junit: aico-report.xml
+    expire_in: 30 days
+  
+  only:
+    - merge_requests
+    - main
+    - develop
+  
+  variables:
+    GROQ_API_KEY: $GROQ_API_KEY`} 
+                      onCopy={copyCode} 
+                    />
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Best Practices</h2>
+                    <ul className="space-y-4 text-slate-400">
+                      <li className="flex gap-3">
+                        <span className="text-primary font-bold">01.</span>
+                        <div>
+                          <strong className="text-white block">Use Appropriate Failure Thresholds</strong>
+                          Use <code className="text-xs bg-white/10 px-1 rounded">--fail-on-error</code> for strict checks and <code className="text-xs bg-white/10 px-1 rounded">--fail-on-warn</code> for higher quality bars.
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="text-primary font-bold">02.</span>
+                        <div>
+                          <strong className="text-white block">Save Reports as Artifacts</strong>
+                          Always save reports (JSON/XML) to artifacts so you can review them later if the pipeline fails.
+                        </div>
+                      </li>
                     </ul>
                   </section>
                 </div>
@@ -345,7 +636,16 @@ export default function Documentation() {
                     <li><a href="#" className="hover:text-primary transition-colors text-primary border-l-2 border-primary pl-3 -ml-[2px]">Overview</a></li>
                     <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Quick Start</a></li>
                     <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Configuration</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Forbidden Patterns</a></li>
                     <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Security Rules</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Best Practices</a></li>
+                  </>
+                ) : activePage === "CI/CD Integration" ? (
+                  <>
+                    <li><a href="#" className="hover:text-primary transition-colors text-primary border-l-2 border-primary pl-3 -ml-[2px]">Overview</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Quick Start</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Command Reference</a></li>
+                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">GitHub Actions</a></li>
                   </>
                 ) : (
                   <>
