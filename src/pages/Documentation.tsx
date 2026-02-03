@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { 
   Search, 
@@ -14,7 +15,10 @@ import {
   Zap,
   Code2,
   Copy,
-  Info
+  Info,
+  Check,
+  Menu,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -55,10 +59,147 @@ const sidebarItems = [
   }
 ];
 
+function HighlightText({ text, highlight }: { text: string, highlight: string }) {
+  if (!highlight.trim()) return <>{text}</>;
+  
+  const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const parts = text.split(new RegExp(`(${escapedHighlight})`, 'gi'));
+  
+  return (
+    <>
+      {parts.map((part, i) => 
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <span key={i} className="bg-primary/20 text-primary rounded-[2px] font-medium">{part}</span>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
+function FeedbackForm() {
+  const [feedback, setFeedback] = useState<'yes' | 'no' | null>(null);
+  const [comment, setComment] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const submitToFormspree = async (data: any) => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("https://formspree.io/f/mlglopnp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        toast({
+          title: "Feedback submitted",
+          description: "Thank you for helping us improve our documentation!",
+        });
+      } else {
+        throw new Error("Submission failed");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was a problem submitting your feedback.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleYes = () => {
+    setFeedback('yes');
+    submitToFormspree({
+      helpful: 'yes',
+      page: window.location.pathname,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitToFormspree({
+      helpful: 'no',
+      comment: comment,
+      page: window.location.pathname,
+    });
+  };
+
+  if (submitted) {
+    return (
+      <div className="mt-16 pt-8 border-t border-white/5 text-center">
+        <div className="p-6 rounded-lg bg-white/5 border border-primary/20 flex flex-col items-center gap-3">
+          <Check className="w-8 h-8 text-primary" />
+          <h4 className="text-lg font-semibold text-white">Thank you for your feedback!</h4>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-16 pt-8 border-t border-white/5">
+      <h4 className="text-lg font-semibold text-white text-center mb-4">Was this page helpful?</h4>
+      <div className="flex justify-center gap-4 mb-6">
+        <Button
+          variant={feedback === 'yes' ? 'default' : 'outline'}
+          onClick={handleYes}
+          disabled={isSubmitting}
+          className={`border-white/10 ${feedback === 'yes' ? 'bg-primary' : 'hover:bg-white/5'}`}
+        >
+          Yes
+        </Button>
+        <Button
+          variant={feedback === 'no' ? 'default' : 'outline'}
+          onClick={() => setFeedback('no')}
+          disabled={isSubmitting}
+          className={`border-white/10 ${feedback === 'no' ? 'bg-destructive text-destructive-foreground' : 'hover:bg-white/5'}`}
+        >
+          No
+        </Button>
+      </div>
+
+      {feedback === 'no' && (
+        <motion.form initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
+          <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="How can we improve this page?" className="w-full p-3 bg-white/5 border border-white/10 rounded-md text-sm focus:ring-primary focus:border-primary transition-colors" rows={3} required disabled={isSubmitting} />
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Feedback"}
+          </Button>
+        </motion.form>
+      )}
+    </div>
+  );
+}
+
 export default function Documentation() {
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
-  const activePage = location.includes("team-rules") ? "Team Rules Guide" : location.includes("ci-cd-integration") ? "CI/CD Integration" : (location.includes("welcome") || location === "/documentation" ? "Welcome" : "Installation");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [tocItems, setTocItems] = useState<{ id: string; text: string; level: number }[]>([]);
+  const [activeSection, setActiveSection] = useState<string>("");
+  const contentRef = useRef<HTMLDivElement>(null);
+  
+  const getActivePage = (path: string) => {
+    if (path.includes("team-rules")) return "Team Rules Guide";
+    if (path.includes("ci-cd-integration")) return "CI/CD Integration";
+    if (path.includes("initialization")) return "Initialization";
+    if (path.includes("quick-start")) return "Quick Start";
+    if (path.includes("security")) return "Security";
+    if (path.includes("ai-providers")) return "AI Providers";
+    if (path.includes("installation")) return "Installation";
+    return "Welcome";
+  };
+
+  const activePage = getActivePage(location);
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -68,8 +209,92 @@ export default function Documentation() {
     });
   };
 
+  const filteredSidebarItems = sidebarItems.map((section) => {
+    const matchesSection = section.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const filteredItems = section.items.filter((item) =>
+      item.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    if (matchesSection) return section;
+    if (filteredItems.length > 0) {
+      return { ...section, items: filteredItems };
+    }
+    return null;
+  }).filter((item): item is typeof sidebarItems[0] => item !== null);
+
+  const getItemHref = (item: string) => {
+    if (item === "Team Rules Guide") return "/documentation/team-rules";
+    if (item === "Welcome") return "/documentation/welcome";
+    if (item === "Installation") return "/documentation/installation";
+    if (item === "CI/CD Integration") return "/documentation/ci-cd-integration";
+    if (item === "Initialization") return "/documentation/initialization";
+    if (item === "Quick Start") return "/documentation/quick-start";
+    if (item === "Vulnerability Scanning") return "/documentation/security";
+    if (item === "AI Providers") return "/documentation/ai-providers";
+    if (item === "Why Aico AI?") return "/documentation/welcome";
+    if (item === "Core Concepts") return "/documentation/welcome";
+    if (item === "AI Code Review") return "/documentation/quick-start";
+    if (item === "Custom Team Rules") return "/documentation/team-rules";
+    if (item === "aico.config.json") return "/documentation/initialization";
+    if (item === "Rule Definitions") return "/documentation/team-rules";
+    if (item === "Data Privacy") return "/documentation/security";
+    if (item === "Ollama (Local AI)") return "/documentation/ai-providers";
+    if (item === "Encryption") return "/documentation/security";
+    return "/documentation";
+  };
+
+  const SidebarList = ({ onLinkClick }: { onLinkClick?: () => void }) => (
+    <div className="space-y-6">
+      {filteredSidebarItems.map((section, idx) => (
+        <div key={idx} className="space-y-2">
+          <div className="flex items-center gap-2 px-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            {section.icon}
+            <span><HighlightText text={section.title} highlight={searchQuery} /></span>
+          </div>
+          <div className="space-y-1">
+            {section.items.map((item, itemIdx) => {
+              const href = getItemHref(item);
+              return (
+                <button
+                  key={itemIdx}
+                  onClick={() => {
+                    setLocation(href);
+                    onLinkClick?.();
+                  }}
+                  className={`w-full text-left px-2 py-1.5 rounded-md text-sm transition-colors flex items-center justify-between group ${
+                    item === activePage ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <HighlightText text={item} highlight={searchQuery} />
+                  <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${item === activePage ? "opacity-100" : ""}`} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="flex h-screen bg-[#0B1120] text-slate-300 font-sans overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-[#0B1120] lg:hidden flex flex-col">
+          <div className="p-4 border-b border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+               <span className="font-display font-bold text-lg text-white tracking-tight">Aico AI Docs</span>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+          <ScrollArea className="flex-1 px-4 py-6">
+            <SidebarList onLinkClick={() => setIsMobileMenuOpen(false)} />
+          </ScrollArea>
+        </div>
+      )}
+
       {/* Sidebar */}
       <aside className="w-72 border-r border-white/5 flex flex-col hidden lg:flex">
         <div className="p-6 border-b border-white/5">
@@ -84,50 +309,26 @@ export default function Documentation() {
         </div>
 
         <ScrollArea className="flex-1 px-4 py-6">
-          <div className="space-y-6">
-            {sidebarItems.map((section, idx) => (
-              <div key={idx} className="space-y-2">
-                <div className="flex items-center gap-2 px-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  {section.icon}
-                  <span>{section.title}</span>
-                </div>
-                <div className="space-y-1">
-                  {section.items.map((item, itemIdx) => {
-                    let href = "/documentation";
-                    if (item === "Team Rules Guide") href = "/documentation/team-rules";
-                    if (item === "Welcome") href = "/documentation/welcome";
-                    if (item === "Installation") href = "/documentation/installation";
-                    if (item === "CI/CD Integration") href = "/documentation/ci-cd-integration";
-                    
-                    return (
-                      <button
-                        key={itemIdx}
-                        onClick={() => setLocation(href)}
-                        className={`w-full text-left px-2 py-1.5 rounded-md text-sm transition-colors flex items-center justify-between group ${
-                          item === activePage ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 hover:text-white"
-                        }`}
-                      >
-                        {item}
-                        <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${item === activePage ? "opacity-100" : ""}`} />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+          <SidebarList />
         </ScrollArea>
       </aside>
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col relative">
         {/* Header */}
-        <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#0B1120]/80 backdrop-blur-md sticky top-0 z-10">
+        <header className="h-16 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 bg-[#0B1120]/80 backdrop-blur-md sticky top-0 z-10">
+          <div className="lg:hidden mr-4">
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)}>
+              <Menu className="w-5 h-5" />
+            </Button>
+          </div>
           <div className="flex-1 max-w-xl relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <Input 
               placeholder="Search documentation..." 
               className="pl-10 bg-white/5 border-white/10 focus-visible:ring-primary/50 text-sm h-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-4 ml-4">
@@ -143,7 +344,7 @@ export default function Documentation() {
 
         {/* Content */}
         <ScrollArea className="flex-1">
-          <div className="max-w-4xl mx-auto px-8 py-12 flex gap-12">
+          <div className="max-w-4xl mx-auto px-4 lg:px-8 py-12 flex gap-12">
             {activePage === "Welcome" ? (
               <div className="flex-1">
                 <div className="mb-10">
@@ -221,7 +422,44 @@ export default function Documentation() {
                       </li>
                     </ul>
                   </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">🏆 Why Choose Aico?</h2>
+                    <div className="space-y-6">
+                      <div className="p-6 bg-white/5 rounded-xl border border-white/5">
+                        <h3 className="text-lg font-semibold text-white mb-3">vs. IDE Extensions (Copilot, Cursor)</h3>
+                        <ul className="space-y-2 text-slate-400 text-sm">
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Team-First:</strong> Shared standards across all developers</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>IDE-Agnostic:</strong> Works with any editor</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Git-Native:</strong> Integrates at the git level</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Enforceable:</strong> Can block commits/pushes</span></li>
+                        </ul>
+                      </div>
+                      
+                      <div className="p-6 bg-white/5 rounded-xl border border-white/5">
+                        <h3 className="text-lg font-semibold text-white mb-3">vs. Traditional Linters (ESLint, Prettier)</h3>
+                        <ul className="space-y-2 text-slate-400 text-sm">
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>AI-Powered:</strong> Understands context and intent</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Semantic Analysis:</strong> Beyond syntax checking</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Security Scanning:</strong> Built-in vulnerability detection</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Auto-Fix:</strong> AI suggests and applies fixes</span></li>
+                        </ul>
+                      </div>
+
+                      <div className="p-6 bg-white/5 rounded-xl border border-white/5">
+                        <h3 className="text-lg font-semibold text-white mb-3">vs. Code Review Tools (SonarQube, Codacy)</h3>
+                        <ul className="space-y-2 text-slate-400 text-sm">
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Lightweight:</strong> No server setup required</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Fast:</strong> Local execution, instant feedback</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Flexible:</strong> Multiple AI providers</span></li>
+                          <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> <span><strong>Privacy:</strong> Local-first option with Ollama</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </section>
                 </div>
+                <PageNavigation activePage={activePage} setLocation={setLocation} />
+                <FeedbackForm />
               </div>
             ) : activePage === "Team Rules Guide" ? (
               <div className="flex-1">
@@ -398,6 +636,8 @@ aico review`}
                     </ul>
                   </section>
                 </div>
+                <PageNavigation activePage={activePage} setLocation={setLocation} />
+                <FeedbackForm />
               </div>
             ) : activePage === "CI/CD Integration" ? (
               <div className="flex-1">
@@ -592,6 +832,284 @@ aico-review:
                     </ul>
                   </section>
                 </div>
+                <PageNavigation activePage={activePage} setLocation={setLocation} />
+                <FeedbackForm />
+              </div>
+            ) : activePage === "Initialization" ? (
+              <div className="flex-1">
+                <div className="mb-10">
+                  <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                    <span>Getting Started</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-primary">Initialization</span>
+                  </nav>
+                  <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">Initialization</h1>
+                  <p className="text-lg text-slate-400 leading-relaxed">
+                    Configure Aico AI for your environment and set up your preferred AI provider.
+                  </p>
+                </div>
+
+                <div className="space-y-10 prose prose-invert prose-slate max-w-none">
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Interactive Setup</h2>
+                    <p className="text-slate-400">Run the initialization wizard to configure Aico globally:</p>
+                    <CodeBlock code="aico init" onCopy={copyCode} />
+                    
+                    <div className="mt-6 p-6 bg-white/5 rounded-xl border border-white/5">
+                      <h3 className="text-lg font-semibold text-white mb-4">What happens during init?</h3>
+                      <ul className="space-y-3 text-slate-400">
+                        <li className="flex gap-3 items-start">
+                          <div className="mt-1 w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs text-primary font-bold">1</span>
+                          </div>
+                          <span><strong>Select AI Provider:</strong> Choose between Groq, OpenAI, DeepSeek, Gemini, or Ollama.</span>
+                        </li>
+                        <li className="flex gap-3 items-start">
+                          <div className="mt-1 w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs text-primary font-bold">2</span>
+                          </div>
+                          <span><strong>Configure API Key:</strong> Securely save your API key (stored in <code>~/.aicorc</code>).</span>
+                        </li>
+                        <li className="flex gap-3 items-start">
+                          <div className="mt-1 w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs text-primary font-bold">3</span>
+                          </div>
+                          <span><strong>Select Model:</strong> Choose the specific model (e.g., gpt-4o, llama-3.3-70b).</span>
+                        </li>
+                        <li className="flex gap-3 items-start">
+                          <div className="mt-1 w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs text-primary font-bold">4</span>
+                          </div>
+                          <span><strong>Git Hooks:</strong> Optionally install pre-push hooks for automatic reviews.</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="mt-8">
+                      <h3 className="text-lg font-semibold text-white mb-4">Example Output</h3>
+                      <div className="bg-black/30 rounded-lg p-4 font-mono text-sm text-slate-300 border border-white/5">
+                        <div className="text-primary mb-2">? Which AI provider would you like to use?</div>
+                        <div className="pl-4 text-white">❯ Groq (Fast & Free tier)</div>
+                        <div className="pl-4 text-slate-500">  OpenAI (GPT-4o, etc.)</div>
+                        <div className="pl-4 text-slate-500">  DeepSeek (Powerful & Cheap)</div>
+                        <div className="pl-4 text-slate-500">  Ollama (Local & Private)</div>
+                        <div className="pl-4 text-slate-500">  Google Gemini</div>
+                        <br/>
+                        <div className="text-primary">? Enter your groq API Key:</div> <span className="text-slate-500">gsk_...</span>
+                        <div className="text-primary">? Model name (default: llama-3.3-70b-versatile):</div> <span className="text-slate-500">[Enter]</span>
+                        <div className="text-primary">? Would you like to setup Aico as a pre-push git hook?</div> <span className="text-slate-500">Yes</span>
+                        <br/>
+                        <div className="text-green-400">✓ Configuration saved globally in ~/.aicorc for groq!</div>
+                        <div className="text-green-400">✓ Husky pre-push hook configured!</div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+                <PageNavigation activePage={activePage} setLocation={setLocation} />
+                <FeedbackForm />
+              </div>
+            ) : activePage === "Quick Start" ? (
+              <div className="flex-1">
+                <div className="mb-10">
+                  <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                    <span>Getting Started</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-primary">Quick Start</span>
+                  </nav>
+                  <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">Quick Start</h1>
+                  <p className="text-lg text-slate-400 leading-relaxed">
+                    Start reviewing code and generating commits in seconds.
+                  </p>
+                </div>
+
+                <div className="space-y-10 prose prose-invert prose-slate max-w-none">
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">1. AI Code Review</h2>
+                    <p className="text-slate-400 mb-4">Stage your changes and run a review:</p>
+                    <CodeBlock 
+                      code={`git add .
+aico review`} 
+                      onCopy={copyCode} 
+                    />
+                    <p className="text-sm text-slate-400 mt-2">Aico will analyze the diff, check for bugs, security issues, and team rule violations.</p>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">2. Generate Commit Messages</h2>
+                    <p className="text-slate-400 mb-4">Let AI write your Conventional Commits:</p>
+                    <CodeBlock code="aico commit" onCopy={copyCode} />
+                    <div className="mt-4 p-4 bg-black/20 rounded-lg border border-white/5 font-mono text-sm text-slate-400">
+                      <p className="text-primary mb-2"># Output example:</p>
+                      <p>feat(auth): add JWT token validation middleware</p>
+                      <p className="mt-2 text-slate-500">? What would you like to do?</p>
+                      <p className="pl-4 text-white">❯ Accept and commit</p>
+                      <p className="pl-4">  Edit message</p>
+                      <p className="pl-4">  Regenerate</p>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">3. Security Scan</h2>
+                    <p className="text-slate-400 mb-4">Run a standalone security audit:</p>
+                    <CodeBlock code="aico security scan" onCopy={copyCode} />
+                  </section>
+                </div>
+                <PageNavigation activePage={activePage} setLocation={setLocation} />
+                <FeedbackForm />
+              </div>
+            ) : activePage === "Security" ? (
+              <div className="flex-1">
+                <div className="mb-10">
+                  <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                    <span>Core Features</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-primary">Security</span>
+                  </nav>
+                  <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">Security Scanning</h1>
+                  <p className="text-lg text-slate-400 leading-relaxed">
+                    Detect vulnerabilities in your code and dependencies before they reach production.
+                  </p>
+                </div>
+
+                <div className="space-y-10 prose prose-invert prose-slate max-w-none">
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Overview</h2>
+                    <p className="text-slate-400">Aico's security engine combines static analysis with AI to detect:</p>
+                    <div className="grid sm:grid-cols-2 gap-4 mt-4">
+                      <div className="p-4 bg-white/5 rounded-lg border border-white/5">
+                        <strong className="text-white block mb-1">Code Vulnerabilities</strong>
+                        <span className="text-sm text-slate-400">SQL Injection, XSS, Command Injection, Path Traversal.</span>
+                      </div>
+                      <div className="p-4 bg-white/5 rounded-lg border border-white/5">
+                        <strong className="text-white block mb-1">Secrets Detection</strong>
+                        <span className="text-sm text-slate-400">Hardcoded API keys, passwords, and tokens.</span>
+                      </div>
+                      <div className="p-4 bg-white/5 rounded-lg border border-white/5">
+                        <strong className="text-white block mb-1">Dependency Audit</strong>
+                        <span className="text-sm text-slate-400">Integrates with npm/yarn/pnpm audit.</span>
+                      </div>
+                      <div className="p-4 bg-white/5 rounded-lg border border-white/5">
+                        <strong className="text-white block mb-1">Configuration Issues</strong>
+                        <span className="text-sm text-slate-400">Insecure defaults, debug modes enabled.</span>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Commands</h2>
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-2">Full Scan</h3>
+                        <CodeBlock code="aico security scan" onCopy={copyCode} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-2">Generate Report</h3>
+                        <CodeBlock code="aico security scan --output report.json" onCopy={copyCode} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-2">Specific Checks</h3>
+                        <CodeBlock 
+                          code={`aico security check --dependencies
+aico security check --code`} 
+                          onCopy={copyCode} 
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-2">Security Report</h3>
+                        <p className="text-slate-400 mb-2">Generate a detailed JSON report:</p>
+                        <CodeBlock code="aico security report" onCopy={copyCode} />
+                        
+                        <div className="mt-4">
+                          <p className="text-sm text-slate-400 mb-2">Report Structure:</p>
+                          <CodeBlock 
+                            language="json"
+                            code={`{
+  "timestamp": "2024-01-15T10:30:00Z",
+  "summary": {
+    "total": 5,
+    "critical": 1,
+    "high": 2,
+    "moderate": 2,
+    "low": 0
+  },
+  "dependencies": [...],
+  "codeVulnerabilities": [...],
+  "recommendations": [...]
+}`} 
+                            onCopy={copyCode} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+                <PageNavigation activePage={activePage} setLocation={setLocation} />
+                <FeedbackForm />
+              </div>
+            ) : activePage === "AI Providers" ? (
+              <div className="flex-1">
+                <div className="mb-10">
+                  <nav className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                    <span>Configuration</span>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-primary">AI Providers</span>
+                  </nav>
+                  <h1 className="text-4xl font-display font-bold text-white mb-4 tracking-tight">AI Providers</h1>
+                  <p className="text-lg text-slate-400 leading-relaxed">
+                    Configure your preferred AI backend. Aico supports both cloud and local options.
+                  </p>
+                </div>
+
+                <div className="space-y-10 prose prose-invert prose-slate max-w-none">
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Supported Providers</h2>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-sm text-slate-400 border-collapse">
+                        <thead>
+                          <tr className="border-b border-white/10">
+                            <th className="py-3 px-4 text-white font-semibold">Provider</th>
+                            <th className="py-3 px-4 text-white font-semibold">Speed</th>
+                            <th className="py-3 px-4 text-white font-semibold">Cost</th>
+                            <th className="py-3 px-4 text-white font-semibold">Privacy</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-white/5">
+                            <td className="py-3 px-4 font-medium text-white">Groq</td>
+                            <td className="py-3 px-4">⚡⚡⚡</td>
+                            <td className="py-3 px-4">Free Tier</td>
+                            <td className="py-3 px-4">Cloud</td>
+                          </tr>
+                          <tr className="border-b border-white/5">
+                            <td className="py-3 px-4 font-medium text-white">OpenAI</td>
+                            <td className="py-3 px-4">⚡⚡</td>
+                            <td className="py-3 px-4">Paid</td>
+                            <td className="py-3 px-4">Cloud</td>
+                          </tr>
+                          <tr className="border-b border-white/5">
+                            <td className="py-3 px-4 font-medium text-white">Ollama</td>
+                            <td className="py-3 px-4">⚡</td>
+                            <td className="py-3 px-4">Free</td>
+                            <td className="py-3 px-4 text-primary">Local</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Environment Variables</h2>
+                    <p className="text-slate-400 mb-4">You can override configuration using environment variables:</p>
+                    <CodeBlock 
+                      code={`export GROQ_API_KEY="gsk_..."
+export OPENAI_API_KEY="sk-..."
+export AICO_PROVIDER="groq"`} 
+                      onCopy={copyCode} 
+                    />
+                  </section>
+                </div>
+                <PageNavigation activePage={activePage} setLocation={setLocation} />
+                <FeedbackForm />
               </div>
             ) : (
               <div className="flex-1">
@@ -623,7 +1141,29 @@ aico-review:
                     <h2 className="text-2xl font-bold text-white mb-4">Global Installation</h2>
                     <CodeBlock code="npm install -g aico-ai" onCopy={copyCode} />
                   </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Install from GitHub Packages</h2>
+                    <p className="text-slate-400 mb-4">Prerequisites: You need a GitHub Personal Access Token with <code>read:packages</code> scope.</p>
+                    
+                    <h3 className="text-lg font-semibold text-white mb-2">1. Configure npm</h3>
+                    <CodeBlock 
+                      code={`echo "@lukasddesouza:registry=https://npm.pkg.github.com" >> .npmrc
+echo "//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN" >> .npmrc`} 
+                      onCopy={copyCode} 
+                    />
+
+                    <h3 className="text-lg font-semibold text-white mb-2 mt-4">2. Install Package</h3>
+                    <CodeBlock code="npm install -g @lukasddesouza/aico-ai" onCopy={copyCode} />
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold text-white mb-4">Verify Installation</h2>
+                    <CodeBlock code="aico --version" onCopy={copyCode} />
+                  </section>
                 </div>
+                <PageNavigation activePage={activePage} setLocation={setLocation} />
+                <FeedbackForm />
               </div>
             )}
 
@@ -631,29 +1171,25 @@ aico-review:
             <aside className="w-56 hidden xl:block shrink-0 pt-4 sticky top-20 self-start">
               <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4">On this page</h4>
               <ul className="space-y-3 text-sm text-slate-400">
-                {activePage === "Team Rules Guide" ? (
-                  <>
-                    <li><a href="#" className="hover:text-primary transition-colors text-primary border-l-2 border-primary pl-3 -ml-[2px]">Overview</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Quick Start</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Configuration</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Forbidden Patterns</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Security Rules</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Best Practices</a></li>
-                  </>
-                ) : activePage === "CI/CD Integration" ? (
-                  <>
-                    <li><a href="#" className="hover:text-primary transition-colors text-primary border-l-2 border-primary pl-3 -ml-[2px]">Overview</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Quick Start</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Command Reference</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">GitHub Actions</a></li>
-                  </>
-                ) : (
-                  <>
-                    <li><a href="#" className="hover:text-primary transition-colors text-primary border-l-2 border-primary pl-3 -ml-[2px]">Requirements</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Global Installation</a></li>
-                    <li><a href="#" className="hover:text-primary transition-colors pl-3 border-l-2 border-transparent">Local Installation</a></li>
-                  </>
-                )}
+                {tocItems.map((item) => (
+                  <li key={item.id} className={item.level === 3 ? "pl-4" : ""}>
+                    <a 
+                      href={`#${item.id}`} 
+                      className={`block transition-colors border-l-2 pl-3 -ml-[2px] ${
+                        activeSection === item.id 
+                          ? "text-primary border-primary" 
+                          : "text-slate-400 hover:text-primary border-transparent"
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" });
+                        setActiveSection(item.id);
+                      }}
+                    >
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </aside>
           </div>
@@ -664,6 +1200,17 @@ aico-review:
 }
 
 function CodeBlock({ code, language = "bash", onCopy }: { code: string, language?: string, onCopy: (c: string) => void }) {
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (isCopied) return;
+    onCopy(code);
+    setIsCopied(true);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  };
+
   return (
     <div className="bg-[#1E293B] rounded-xl border border-white/5 overflow-hidden group">
       <div className="px-4 py-2 bg-white/5 border-b border-white/5 flex items-center justify-between">
@@ -671,11 +1218,20 @@ function CodeBlock({ code, language = "bash", onCopy }: { code: string, language
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={() => onCopy(code)}
+          onClick={handleCopy}
           className="h-7 px-2 text-[10px] text-slate-400 hover:text-white"
         >
-          <Copy className="w-3 h-3 mr-1" />
-          Copy
+          {isCopied ? (
+            <div className="flex items-center text-primary">
+              <Check className="w-3 h-3 mr-1" />
+              <span>Copied!</span>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <Copy className="w-3 h-3 mr-1" />
+              <span>Copy</span>
+            </div>
+          )}
         </Button>
       </div>
       <div className="p-5 font-mono text-sm overflow-x-auto whitespace-pre">

@@ -7,6 +7,8 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Documentation from "@/pages/Documentation";
 import { Analytics } from "@vercel/analytics/react"
+import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
 
 function Router() {
   return (
@@ -17,6 +19,12 @@ function Router() {
       <Route path="/documentation/installation" component={Documentation} />
       <Route path="/documentation/team-rules" component={Documentation} />
       <Route path="/documentation/ci-cd-integration" component={Documentation} />
+      <Route path="/documentation/initialization" component={Documentation} />
+      <Route path="/documentation/quick-start" component={Documentation} />
+      <Route path="/documentation/security" component={Documentation} />
+      <Route path="/documentation/ai-providers" component={Documentation} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogPost} />
       <Route component={NotFound} />
     </Switch>
   );

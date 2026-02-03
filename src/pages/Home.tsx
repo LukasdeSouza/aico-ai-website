@@ -59,6 +59,7 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <a href="#features" className="hover:text-primary transition-colors">Features</a>
             <Link href="/documentation" className="hover:text-primary transition-colors">Documentation</Link>
+            <Link href="/blog" className="hover:text-primary transition-colors">Blog</Link>
             <a href="#comparison" className="hover:text-primary transition-colors">Comparison</a>
           </div>
           <div className="flex items-center gap-4">
