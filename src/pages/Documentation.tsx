@@ -1199,6 +1199,49 @@ echo "//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN" >> .npmrc`}
   );
 }
 
+function PageNavigation({ activePage, setLocation }: { activePage: string, setLocation: (path: string) => void }) {
+  const pages = [
+    { name: "Welcome", path: "/documentation/welcome" },
+    { name: "Installation", path: "/documentation/installation" },
+    { name: "Quick Start", path: "/documentation/quick-start" },
+    { name: "Team Rules Guide", path: "/documentation/team-rules" },
+    { name: "CI/CD Integration", path: "/documentation/ci-cd-integration" },
+    { name: "Security", path: "/documentation/security" },
+    { name: "AI Providers", path: "/documentation/ai-providers" },
+  ];
+
+  const currentIndex = pages.findIndex(p => p.name === activePage);
+  const prevPage = currentIndex > 0 ? pages[currentIndex - 1] : null;
+  const nextPage = currentIndex < pages.length - 1 ? pages[currentIndex + 1] : null;
+
+  return (
+    <div className="mt-12 pt-8 border-t border-white/5 flex items-center justify-between">
+      {prevPage ? (
+        <button
+          onClick={() => setLocation(prevPage.path)}
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm">{prevPage.name}</span>
+        </button>
+      ) : (
+        <div />
+      )}
+      {nextPage ? (
+        <button
+          onClick={() => setLocation(nextPage.path)}
+          className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
+        >
+          <span className="text-sm">{nextPage.name}</span>
+          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </button>
+      ) : (
+        <div />
+      )}
+    </div>
+  );
+}
+
 function CodeBlock({ code, language = "bash", onCopy }: { code: string, language?: string, onCopy: (c: string) => void }) {
   const [isCopied, setIsCopied] = useState(false);
 
